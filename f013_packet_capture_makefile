@@ -1,0 +1,13 @@
+all: f013_packet_capture.out f013_packet_capture.beam
+
+f013_packet_capture.out: f013_packet_capture.c
+	gcc -Wall -lpcap -o f013_packet_capture.out f013_packet_capture.c
+
+f013_packet_capture.beam: f013_packet_capture.erl
+	erlc f013_packet_capture.erl
+
+clean:
+	rm -f f013_packet_capture.log
+
+clean_all: clean
+	rm -f f013_packet_capture.out f013_packet_capture.beam

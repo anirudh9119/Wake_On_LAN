@@ -1,0 +1,189 @@
+<html>
+<head>
+	<title>Wake On LAN - IIIT Hyderabad</title>
+</head>
+<body>
+<erl>
+
+-define(IP_interface_list, 
+	[{"10.1.33.0/24", "eth0.500"},
+	 {"10.1.34.0/24", "eth0.501"},
+	 {"10.1.35.0/24", "eth0.502"},
+	 {"10.1.36.0/24", "eth0.503"},
+	 {"10.1.37.0/24", "eth0.504"},
+	 {"10.1.38.0/24", "eth0.505"},
+	 {"10.1.39.0/24", "eth0.506"},
+	 {"10.1.40.0/24", "eth0.507"},
+
+	 {"10.1.65.0/24", "eth0.510"},
+	 {"10.1.66.0/24", "eth0.511"},
+	 {"10.1.67.0/24", "eth0.512"},
+
+	 {"10.1.97.0/24", "eth0.520"},
+	 {"10.1.98.0/24", "eth0.521"},
+	 {"10.1.99.0/24", "eth0.522"},
+
+	 {"10.1.129.0/24", "eth0.523"},
+	 {"10.1.130.0/24", "eth0.524"},
+	 {"10.1.131.0/24", "eth0.525"},
+	 {"10.1.132.0/24", "eth0.526"},
+	 {"10.1.133.0/24", "eth0.527"},
+
+	 {"10.2.4.0/24", "eth0.600"},
+	 {"10.2.8.0/24", "eth0.601"},
+	 {"10.2.12.0/24", "eth0.602"},
+	 {"10.2.16.0/24", "eth0.603"},
+	 {"10.2.20.0/24", "eth0.604"},
+	 {"10.2.24.0/24", "eth0.605"},
+	 {"10.2.28.0/24", "eth0.606"},
+	 {"10.2.32.0/24", "eth0.607"},
+	 {"10.2.36.0/24", "eth0.608"},
+	 {"10.2.40.0/24", "eth0.609"},
+	 {"10.2.44.0/24", "eth0.610"},
+	 {"10.2.48.0/24", "eth0.611"},
+	 {"10.2.52.0/24", "eth0.612"},
+	 {"10.2.56.0/24", "eth0.613"},
+
+	 {"10.3.1.0/24", "eth0.700"},
+	 {"10.3.2.0/24", "eth0.701"},
+	 {"10.3.3.0/24", "eth0.702"},
+	 {"10.3.5.0/24", "eth0.704"},
+	 {"10.3.8.0/22", "eth0.703"},
+
+
+         {"10.4.4.0/23", "eth0.2"},
+
+	 {"10.4.12.0/22", "eth0.803"},
+
+	 {"10.5.1.0/24", "eth0.400"},
+	 {"10.5.2.0/24", "eth0.401"}
+	]).
+
+
+get_interface_name(IP1) ->
+    get_interface_name(IP1, ?IP_interface_list).
+
+get_interface_name(IP1, []) ->
+    not_in_list;
+get_interface_name(IP1, [{IP1, Eth2} | _T]) ->
+    Eth2;
+get_interface_name(IP1, [_ | T]) ->
+    get_interface_name(IP1, T).
+
+
+validate_mac(MAC1) ->
+    %%io:format("MAC1 ~p~n", [MAC1]),
+    if 
+	MAC1=:= undefined -> 
+	    false;
+
+	true ->
+
+	    Tokens1=string:tokens(MAC1, ":"),
+	    %% Length1 should be 6
+	    Length1=length(Tokens1),
+
+	    %% Verify that all sub-elements are of length 2
+	    Correct_length2=lists:all(fun(Elem1) ->
+					      length(Elem1) =:= 2
+				      end,
+				      Tokens1),
+
+	    if 
+		Length1 =/= 6 -> false;
+		Correct_length2 =:= false -> false;
+		true ->  true
+	    end
+    end.
+    
+
+
+out(Arg) ->
+    Get_get=fun(Variable1) ->
+		 case yaws_api:queryvar(Arg, Variable1) of
+		     undefined -> undefined;
+		     {ok, Value1} -> Value1
+		 end
+	     end,
+    Wake1=Get_get("wake"),
+    if 
+	Wake1 =:= undefined ->
+	    {ehtml, generate_wol_ehtml("") };
+	
+	true ->
+	    IP_address1=Get_get("ip_range"),
+	    MAC1=Get_get("mac_address"),
+	    Interface_name1=get_interface_name(IP_address1),
+	    MAC_is_valid=validate_mac(MAC1),
+	    if
+		Interface_name1 =:= not_in_list ->
+		    {ehtml, generate_wol_ehtml("Interface chosen is not available")};
+
+		MAC_is_valid =:= false ->
+		    {ehtml, generate_wol_ehtml("Invalid MAC address was supplied.")};
+
+		true ->
+		    case whereis(wol_server) of 
+			undefined ->
+			    {ehtml, generate_wol_ehtml("Internal error. wol_server is not registered.")};
+
+			Pid1 ->
+			    Pid1 ! {send_wol, self(), Interface_name1, MAC1},
+			    receive
+				ok ->
+				    {ehtml, generate_wol_ehtml("Magic packet sent successfully.")}
+			    after 2000 ->
+				    {ehtml, generate_wol_ehtml("Internal error. No acknowledgement received.")}
+			    end
+		    end
+	    end
+    end. 
+
+
+generate_wol_ehtml(Message) ->
+    [{h3, [{style, "text-align:center"}], "Wake On LAN service"},
+     {h4, [], Message},
+     {form, [{action, "index.yaws"}, {method, "GET"}], 
+      [
+       {table, [], 
+	[
+	 {tr, [], 
+	  [
+	   {td, [], "IP Range:"},
+	   {td, [], {select, [{name, "ip_range"}], get_ip_options()}}
+	  ]
+	 },
+	 {tr, [],
+	  [
+	   {td, [], "MAC address (AA:AA:AA:AA:AA:AA) :"},
+	   {td, [], {input, [{type, "text"}, {name, "mac_address"}]}}
+	  ]
+	 }
+	]
+       },
+       {input, [{type, "submit"}, {name, "wake"}, {value, "Wake"}]}
+      ]
+     },
+     get_link_info()
+    ].
+
+
+get_link_info() ->
+    "<p>
+        For instructions on how to enable 'Wake On LAN' on your system click <a href='instructions.yaws'>here</a>. For finding IP address with the help of MAC address click <a href='mac_to_ip.yaws'>here</a>.
+        <br/>
+	<br/>
+	For feed-back and queries regarding wake on LAN service you can send email to '<b>Saurabh Barjatiya &lt;saurabh.barjatiya@iiit.ac.in&gt;</b>' <br/>
+     </p>
+".
+
+
+get_ip_options() ->
+    lists:map(fun({IP_range1, Interface}) ->
+		      {option, [{value, IP_range1}], IP_range1}
+	      end,
+	      ?IP_interface_list).
+  
+</erl>
+</body>
+</html>

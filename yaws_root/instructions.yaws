@@ -1,0 +1,251 @@
+<html>
+  <head>
+    <title>Instruction to setup Wake On LAN</title>
+  </head>
+  <body>
+    <h2>Instructions to setup machine for Wake On LAN service</h2>
+    <p>
+      Basic configuration needs to be done in BIOS and in OS
+      to enable Wake On LAN feature. Once enabled we can
+      switch on machine from anywhere in the campus and even
+      over VPN. Hence even if you are at your home hundreds
+      of kms away you can switch on you lab/hostel machine,
+      access it over VPN and then even power it off to use
+      electricity efficiently.
+    </p>
+
+    <p>
+      <span style="font-weight:bold">Note that configuration
+      in both BIOS and OS is required to make it work. If
+      you omit any one of these then Wake On LAN will not
+      work</span>. Instructions for machines/OS not listed
+      below can be requested through email. We will try to
+      add more information soon.
+    </p>
+
+    <h3>OS Instructions</h3>
+    <p>
+      <ul>
+	<li><span style="font-weight:bold;text-decoration:underline">Windows:</span>
+	  <ul>
+	    <li>Windows XP
+	      <ol>
+		<li>Right click "My computer" and go to properties</li>
+		<li>Go to "Hardware" tab.</li>
+		<li>Start "Device Manager"</li>
+		<li>Go to network adapters and choose your LAN network adapter</li>
+		<li>Right click "LAN adapter" and choose properties</li>
+		<li>Go to "Power Management" tab</li>
+		<li>Choose "Allow computer to turn of this
+		device to save power" and "Allow this device
+		to bring the computer out of stand by" and
+		"Only allow management stations to bring the
+		computer out of stand by"</li>
+		<li>Click 'Ok' to close all pop-up windows</li>
+		<li>Close Device Manager</li>
+	      </ol>
+	    </li>
+	    <li>Windows 7
+	      <ol>
+		<li>Nothing needs to be done</li>
+	      </ol>
+	    </li>
+	  </ul>
+	</li>
+	<li><span style="font-weight:bold;text-decoration:underline">Linux:</span>
+	  <ul>
+	    <li>Fedora/Redhat/CentOS
+	      <ol>
+		<li>In Fedora/Redhat/Cent-OS type distributions go to /etc/sysconfig/network-scripts directory</li>
+		<li>Edit file ifcfg-eth0 (or eth&lt;n&gt; based on your machine configuration)</li>
+		<li>Add one line - ETHTOOL_OPTS="wol g" - at end of this file</li>
+		<li>You can also give command 'ethtool -s eth0 wol g' to enable Wake On LAN for this session.</li>
+	      </ol>
+	    </li>
+	    <li>For Kubuntu
+	      <ol>
+		<li>Add line 'ethtool -s eth0 wol g' to some startup script and WOL would work fine.</li>
+	      </ol>
+	    </li>
+	  </ul>
+	</li>
+      </ul>
+    </p>
+
+    <h3>BIOS Instructions</h3>
+    <p>
+      <ul>
+	<li><span style="font-weight:bold;text-decoration:underline">New zenith machine (Serial number of type IIIT/INST/CR10*):</span>
+	  <ul>
+	    <li>Press 'F2' during PC boot to go to BIOS options.</li>
+	    <li>Go to power menu using left/right arrow keys.</li>
+	    <li>Go to option "Wake on LAN from S5" and choose option "Power On" using '+/-' keys.</li>
+	    <li>Come to 'Exit' option using left/right arrow keys.</li>
+	    <li>Choose option 'Exit Saving Changes" and press enter</li>
+	    <li>On confirmation dialog choose "Yes"</li>
+	  </ul>
+	</li>
+	<li><span style="font-weight:bold;text-decoration:underline">Last years zenith machine (Serial number of type IIIT/INST/CR09*):</span>
+	  <ul>
+	    <li>Press 'Del' during PC boot to go to BIOS (American Megatrends Inc) </li>
+	    <li>Go to "Power Management features" using arrow keys and press "Enter".</li>
+	    <li>Go to "APM Configuration" using arrow keys and press "Enter".</li>
+	    <li>For option "Power on By PME#" the value should be "Enabled". If it is not set then use '+/-' keys to change value to 'Enabled'.</li>
+	    <li>Press 'Esc' twice to come to main BIOS menu.</li>
+	    <li>Go to option 'Save &amp; Exit Changes" and press 'Enter'</li>
+	    <li>Choose 'Ok' on confirmation dialog box.</li>
+	  </ul>
+	</li>
+	<li><span style="font-weight:bold;text-decoration:underline">Dell machines (Serial number of type IIIT/INST/CR08*)  :</span>
+	  <ul>
+	    <li>Press 'F2' to go to BIOS</li>
+	    <li>Use arrow keys to go to Power Management</li>
+	    <li>Select "Remote Wake Up" and choose option 'On'</li>
+	    <li>Press 'Esc' to get exit menu.</li>
+	    <li>Choose 'Save/Exit' option.</li>
+	  </ul>
+	</li>
+	<li><span style="font-weight:bold;text-decoration:underline">Black HCL machine (Serial number of type IIIT/INST/CR07*):</span>
+	  <ul>
+	    <li>Go to BIOS by pressing 'Del' key during PC boot.</li>
+	    <li>Go to 'Power' menu option using arrow keys</li>
+	    <li>Go to 'APM configuration' using arrow keys and press 'Enter'</li>
+	    <li>Go to "Power Up On PCI/PCIE Devices" and change value to "Enabled" using '+/-' keys.</li>
+	    <li>Press 'Esc' to come back to 'Power' menu option.</li>
+	    <li>Use arrow keys to go to 'Exit' option and press 'Enter'</li>
+	    <li>Choose 'Exit and Save changes' and press enter.</li>
+	    <li>Choose 'Yes' on confirmation dialog.</li>
+	  </ul>
+	</li>
+	<!--			<li><span style="font-weight:bold;text-decoration:underline">:</span>
+				<li></li>
+	<li></li>
+	<li></li>
+      </ul>
+</li>-->
+	<!--<li><span style="font-weight:bold;text-decoration:underline">:</span>
+		      <li></li>
+	<li></li>
+	<li></li>
+      </ul>
+</li>-->
+      </ul>
+    </p>
+
+
+    <h3>Troubleshooting and simple Tips</h3>
+    <p>
+      <ul>
+	<!--<li><span style="font-weight:bold;text-decoration:underline">Ethernet light should glow in off machine:</span>
+		      <ul>
+			<li>
+			  We are enabling Wake On LAN in BIOS so that power is available to 
+			  LAN card even when machine is off. We are enabling Wake On LAN in OS so 
+			  that LAN card is configured to switch on machine when it receives Wake On LAN 
+			  Magic Packet. In case Wake On LAN is not working just switch off machine as see 
+			  if LEDs near Ethernet port are glowing even when machine is off. If not, 
+			  it is BIOS configuration issue or machine does not supports Wake On LAN
+			</li>
+		      </ul>
+	</li>-->
+	<li><span style="font-weight:bold;text-decoration:underline">Switch off monitor before leaving:</span>
+	  <ul>
+	    <li>
+	      There is no point in leaving monitors on when you work remotely. So please 
+	      switch off monitors (especially CRT) when you leave labs so that even if 
+	      you work remotely monitor does not uses any power.
+	    </li>
+	  </ul>
+	<li><span style="font-weight:bold;text-decoration:underline">Shutting down machine remotely:</span>
+	  <ul>
+	    <li><span style="text-decoration:underline">Linux:</span> 
+	      We can shutdown Linux machine remotely by connecting to root 
+	      user using ssh and then running command 'shutdown -h now'. 
+	      For distributions which do not allow connecting as root, we can 
+	      connect as normal user and use command 'sudo shutdown -h now'.
+	    </li>
+	    <li><span style="text-decoration:underline">Windows:</span> 
+	      Start 'Task Manager' by right-clicking on Start-Menu bar. 
+	      In 'Task Manager' there is 'Shutdown' menu with option "Turn off" 
+	      which can be used to shutdown machine remotely.
+	    </li>
+	  </ul>
+	</li>
+	<li><span style="font-weight:bold;text-decoration:underline">Unsupported systems:</span>
+	  <ul>
+	    <li><span style="font-weight:bold">Laptops :</span> 
+	      I have tried three four different 
+	      laptops from Dell and all of them do not support Wake On Lan. So it is good bet that 
+	      laptops do not support this feature. It is still possible that HP, Acer or some other 
+	      vendors laptop support Wake On Lan. 
+	      <br/>
+	      Laptops users who use Linux can still use Wake On LAN if instead of shutting down the 
+	      system is left in suspend mode. Using GUI we get suspend option or we can also run 
+	      'pm-suspend' command as root to suspend machine. Laptops wake up from suspend using 
+	      WOL without any problem provided OS is configured to listen for WOL requests. 
+	      <br/>
+	      This has been seen to work on Dell Vostro 1400 laptops and most probably would work 
+	      on other machines too. In suspend state I observed latop discharging only 3% battery 
+	      power in 30 minutes. So it may take as long as 1000 minutes for laptop to run out of 
+	      battery when in suspend state, as opposed to around 200 minutes when running normally. 
+	    </li>
+	    <li><span style="font-weight:bold">
+		White HCL machines :</span> We have not been able 
+	      to enable Wake On LAN on White HCL machines with code like IIIT/INST/CR06*. Even after 
+	      enabling Wake On LAN in BIOS when we power off machine, even power from LAN card is 
+	      cut. Hence there is no way to start machine using LAN. We are still working on finding 
+	      a solution using BIOS updates.
+	    </li>
+	    <li><span style="font-weight:bold">Fedora 12 on Dell Optiplex 330:</span> 
+	      For some reason WOL gets disabled when we shutdown Fedora 12 
+	      system either using GUI menu option (System -&gt; Shutdown) or using command 
+	      'shutdown -h now'.
+	      <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	      If we use hibernate then Wake On LAN (WOL) seems to work fine. 
+	      So when using system remotely either use 'pm-hibernate' command to hibernate system 
+	      or restart it using 'shutdown -r now', but do not shut it down using 'shutdown -h now' 
+	      else WOL wont work. If you have already shutdown machine using shutdown 
+	      command accidently then remove power cord from CPU for few seconds 
+	      so that Ethernet LEDs stop blinking. Now put the power cord back in CPU and 
+	      WOL will work properly.
+	      <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	      We will try to find better solution to Fedora 12 WOL problem soon. 
+	      It works fine on Fedora 11 on Dell Optiplex. Also Fedora 12 on 
+	      Black HCL machines works fine too. 
+	    </li>
+	    <li><span style="font-weight:bold">CentOS 5.4 on Dell Optiplex 330:</span> 
+	      As with Fedora 12 on Dell Optiplex 330, if we shutdown machine then WOL 
+	      does not works. Hibernate is also broken when we use CentOS-5.4 on 
+	      Dell Optiplex 330. So best powersaving option is to use 'Suspend'. We 
+	      can remotely suspend machine using 'pm-suspend' command and when we are 
+	      leaving lab, we can use GUI to suspend machine. 
+	      <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	      There are few other things that also need to be taken care of when using
+	      CentOS as CentOS uses relatively older libraried/kernels which have been
+	      tested for years. <br/>
+	      1. Use non-xen kernel as default kernel. Edit '/etc/grub.conf' and configure
+	      system to boot from non-xen kernel by default. Xen does not supports ACPI
+	      properly as it is meant for virtualization and guest OS do not have to woory
+	      about ACPI. <br/>
+	      2. Do 'lspci' and see list of PCI devices. One of the devices would be Ethernet
+	      Controller. Note down the first two digits of the line where Ethernet controller
+	      is listed, this is the PCI number of Ethernet Contoller. Now use 
+	      'more /proc/acpi/wakeup' to see devices which are allowed to wake machine. If the
+	      Ethernet PCI controller is not allowed to wake machine up then use 
+	      "echo 'PCI2' &gt; /proc/acpi/wakeup" to enable PCI2 to wakeup computer from suspend
+	      or hibernate. (Here it was assumed the Ethernet controller PCI number is 2, replace 
+	      PCI2 with PCI&lt;n&gt; for your machine, where 'n' is the PCI number of Ethernet
+	      controller.
+	      <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	      Try to search a little on Internet if above steps are not clear to learn about
+	      sleep states, hibernate etc. so that you can configure machine to Wake up when
+	      in suspend or hibernate state from proper PCI device (Ethernet controller). Test
+	      the setup by first suspending the machine using 'pm-suspend' and then waking it up
+	      using WOL
+	    </li>
+	  </ul>
+	</li>
+      </ul>
+    </p>
+  </body>
+</html>

@@ -1,0 +1,108 @@
+<html>
+<head>
+	<title>Wake On LAN - IIIT Hyderabad</title>
+</head>
+<body>
+<erl>
+
+
+validate_mac(MAC1) ->
+    %%io:format("MAC1 ~p~n", [MAC1]),
+    if 
+	MAC1=:= undefined -> 
+	    false;
+
+	true ->
+
+	    Tokens1=string:tokens(MAC1, ":"),
+	    %% Length1 should be 6
+	    Length1=length(Tokens1),
+
+	    %% Verify that all sub-elements are of length 2
+	    Correct_length2=lists:all(fun(Elem1) ->
+					      length(Elem1) =:= 2
+				      end,
+				      Tokens1),
+
+	    if 
+		Length1 =/= 6 -> false;
+		Correct_length2 =:= false -> false;
+		true ->  true
+	    end
+    end.
+    
+
+
+out(Arg) ->
+    Get_get=fun(Variable1) ->
+		 case yaws_api:queryvar(Arg, Variable1) of
+		     undefined -> undefined;
+		     {ok, Value1} -> Value1
+		 end
+	     end,
+    Lookup1=Get_get("lookup"),
+    if 
+	Lookup1 =:= undefined ->
+	    {ehtml, generate_lookup_ehtml("") };
+	
+	true ->
+	    MAC1=Get_get("mac_address"),
+	    MAC_is_valid=validate_mac(MAC1),
+	    if
+		MAC_is_valid =:= false ->
+		    {ehtml, generate_lookup_ehtml("Invalid MAC address was supplied.")};
+
+		true ->
+		    case whereis(pcapture_handler) of 
+			undefined ->
+			    {ehtml, generate_lookup_ehtml("Internal error. pcapture_handler is not registered.")};
+
+			Pid1 ->
+			    MAC2=MAC1 -- ":::::::::",
+			    MAC3=list_to_integer(MAC2, 16),
+			    Pid1 ! {lookup, self(), MAC3},
+			    receive
+				undefined ->
+				    {ehtml, generate_lookup_ehtml("MAC address is not present in database.")};
+
+				IP1 ->
+				    {A1, A2, A3, A4}=IP1,
+				    Message1 = lists:flatten(io_lib:format("MAC ~p has IPv4 address ~p.~p.~p.~p,",
+									  [MAC1, A1, A2, A3, A4] )),
+				    {ehtml, generate_lookup_ehtml(Message1)}
+
+			    after 2000 ->
+				    {ehtml, generate_lookup_ehtml("Internal error. No replyyy received.")}
+			    end
+		    end
+	    end
+    end. 
+
+
+generate_lookup_ehtml(Message) ->
+    [{h3, [{style, "text-align:center"}], "Wake On LAN
+    service - MAC to IP lookup"},
+     {h4, [], Message},
+     {form, [{action, "mac_to_ip.yaws"}, {method, "GET"}], 
+      [
+       {table, [], 
+	[
+	 {tr, [],
+	  [
+	   {td, [], "MAC address (AA:AA:AA:AA:AA:AA) :"},
+	   {td, [], {input, [{type, "text"}, {name, "mac_address"}]}}
+	  ]
+	 }
+	]
+       },
+       {input, [{type, "submit"}, {name, "lookup"}, {value, "Lookup"}]}
+      ]
+     },
+     {a, [{href, "index.yaws"}], "&lt;&lt;Back"}
+    ].
+
+
+  
+</erl>
+</body>
+</html>
